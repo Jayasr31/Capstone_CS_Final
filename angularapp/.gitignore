@@ -1,0 +1,8 @@
+## Angular / Node
+node_modules/
+dist/
+.angular/
+.sass-cache/
+*.js.map
+npm-debug.log
+yarn-error.log
