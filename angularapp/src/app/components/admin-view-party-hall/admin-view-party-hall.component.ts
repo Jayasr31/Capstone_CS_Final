@@ -9,14 +9,22 @@ import { PartyHall } from '../../models/partyhall.model';
 })
 export class AdminViewPartyHallComponent implements OnInit {
   halls: PartyHall[] = [];
-  editingId: number | null = null;
   editData: Partial<PartyHall> = {};
   isLoading = true;
   successMsg = '';
   errorMsg = '';
   showDeleteConfirm = false;
   deleteTargetId: number | null = null;
-  themes = ['Royal', 'Modern', 'Garden', 'Classic', 'Luxury', 'Rustic', 'Beach', 'Industrial'];
+  themes = ['Royal', 'Modern', 'Garden', 'Classic', 'Luxury', 'Rustic', 'Beach', 'Industrial', 'Contemporary', 'Rooftop Luxury', 'Heritage', 'Garden Party', 'Beachside'];
+
+  // View mode: table or grid
+  viewMode: 'table' | 'grid' = 'table';
+
+  // Hall detail popup (shown on row/card click)
+  selectedHall: PartyHall | null = null;
+
+  // Edit form modal
+  showEditModal = false;
 
   constructor(private hallService: PartyhallService) {}
 
@@ -30,18 +38,33 @@ export class AdminViewPartyHallComponent implements OnInit {
     });
   }
 
-  startEdit(hall: PartyHall): void {
-    this.editingId = hall.partyHallId!;
-    this.editData = { ...hall };
+  openHallDetail(hall: PartyHall): void {
+    this.selectedHall = hall;
   }
 
-  cancelEdit(): void { this.editingId = null; this.editData = {}; }
+  closeHallDetail(): void {
+    this.selectedHall = null;
+  }
+
+  openEdit(): void {
+    if (!this.selectedHall) return;
+    this.editData = { ...this.selectedHall };
+    this.selectedHall = null;
+    this.showEditModal = true;
+  }
+
+  closeEdit(): void {
+    this.showEditModal = false;
+    this.editData = {};
+    this.errorMsg = '';
+  }
 
   saveEdit(): void {
     this.hallService.updatePartyHall(this.editData as PartyHall).subscribe({
       next: () => {
         this.successMsg = 'Party hall updated successfully!';
-        this.editingId = null;
+        this.showEditModal = false;
+        this.editData = {};
         this.loadHalls();
         setTimeout(() => this.successMsg = '', 3000);
       },
@@ -50,6 +73,7 @@ export class AdminViewPartyHallComponent implements OnInit {
   }
 
   confirmDelete(id: number): void {
+    this.selectedHall = null;
     this.deleteTargetId = id;
     this.showDeleteConfirm = true;
   }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,7 @@ export class LoginComponent {
   isLoading = false;
   showPassword = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, public theme: ThemeService) {}
 
   onLogin(): void {
     if (!this.email || !this.password) {
@@ -28,11 +29,8 @@ export class LoginComponent {
     this.authService.login(this.email, this.password).subscribe({
       next: (res) => {
         this.isLoading = false;
-        if (res.userRole === 'Admin') {
-          this.router.navigate(['/admin-dashboard']);
-        } else {
-          this.router.navigate(['/customer-dashboard']);
-        }
+        // Always go to home page after login; Home nav link leads to the role-based dashboard
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.isLoading = false;

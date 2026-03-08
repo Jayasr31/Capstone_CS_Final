@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-register',
@@ -23,11 +24,32 @@ export class RegisterComponent {
   isLoading = false;
   showPassword = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  get passwordStrength(): 'weak' | 'strong' | 'very-strong' {
+    const p = this.user.password;
+    if (!p || p.trim().length < 6 || /\s/.test(p)) return 'weak';
+    const hasUpper = /[A-Z]/.test(p);
+    const hasLower = /[a-z]/.test(p);
+    const hasNumber = /[0-9]/.test(p);
+    const hasSpecial = /[^A-Za-z0-9]/.test(p);
+    if (p.length >= 8 && hasUpper && hasLower && hasNumber && hasSpecial) return 'very-strong';
+    if (p.length >= 6 && ((hasUpper || hasLower) && hasNumber)) return 'strong';
+    return 'weak';
+  }
+
+  constructor(private authService: AuthService, private router: Router, public theme: ThemeService) {}
 
   onRegister(): void {
+    // Trim all fields before validation
+    this.user.username = this.user.username.trim();
+    this.user.email = this.user.email.trim();
+    this.user.mobileNumber = this.user.mobileNumber.trim();
+
     if (!this.user.email || !this.user.password || !this.user.username || !this.user.mobileNumber) {
       this.errorMsg = 'All fields are required.';
+      return;
+    }
+    if (/\s/.test(this.user.password)) {
+      this.errorMsg = 'Password must not contain spaces.';
       return;
     }
     if (this.user.password !== this.confirmPassword) {
@@ -42,10 +64,11 @@ export class RegisterComponent {
       this.errorMsg = 'Mobile number must be 10 digits.';
       return;
     }
-    if (this.user.userRole === 'Admin' && !this.adminKey) {
+    if (this.user.userRole === 'Admin' && !this.adminKey.trim()) {
       this.errorMsg = 'Admin secret key is required.';
       return;
     }
+    this.adminKey = this.adminKey.trim();
 
     this.isLoading = true;
     this.errorMsg = '';

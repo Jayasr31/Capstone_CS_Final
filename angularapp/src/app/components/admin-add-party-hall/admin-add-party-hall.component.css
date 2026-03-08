@@ -22,14 +22,94 @@
 
 .full-width { grid-column: 1 / -1; }
 
-.image-preview {
+/* ── File Upload ── */
+.file-upload-area {
+  margin-top: 0.5rem;
+  border: 2px dashed rgba(212,175,55,0.35);
+  border-radius: 14px;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+  background: rgba(212,175,55,0.03);
+}
+.file-upload-area:hover {
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.07);
+}
+.secondary-upload { padding: 1.5rem 1rem; }
+.upload-icon { font-size: 2.4rem; color: var(--gold); margin-bottom: 0.5rem; }
+.upload-icon-sm { font-size: 1.6rem; color: var(--gold); margin-bottom: 0.25rem; }
+.upload-text { font-size: 0.95rem; color: var(--text-primary); margin: 0.25rem 0 0; }
+.upload-hint { font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+.image-preview-box {
   margin-top: 0.75rem;
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
-  max-height: 200px;
-  border: 1px solid rgba(212,175,55,0.15);
+  border: 1px solid rgba(212,175,55,0.25);
+  max-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10,14,26,0.6);
 }
-.image-preview img { width: 100%; max-height: 200px; object-fit: cover; }
+.preview-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.btn-remove-img {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: rgba(220,53,69,0.85);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+.btn-remove-img:hover { background: rgb(220,53,69); }
+
+.additional-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+.additional-preview-item {
+  position: relative;
+  width: 100px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+.additional-preview-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.btn-remove-small {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(220,53,69,0.85);
+  color: #fff;
+  border: none;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.btn-remove-small:hover { background: rgb(220,53,69); }
 
 .form-actions {
   display: flex;

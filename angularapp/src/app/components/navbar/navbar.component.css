@@ -192,6 +192,90 @@
   transition: all 0.3s ease;
 }
 
+/* Logout Modal */
+.logout-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+.logout-modal {
+  background: linear-gradient(145deg, #1E1810, #2A2015);
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  width: 340px;
+  max-width: 90vw;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+  animation: slideUp 0.25s ease;
+}
+.logout-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  animation: wave 0.6s ease;
+}
+.logout-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: #F0E8D5;
+  margin: 0 0 0.4rem;
+}
+.logout-subtitle {
+  color: #7A6E5F;
+  font-size: 0.9rem;
+  margin: 0 0 1.75rem;
+}
+.logout-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.btn-logout-cancel {
+  flex: 1;
+  padding: 0.65rem 1.25rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 10px;
+  color: #B8A98C;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-logout-cancel:hover {
+  background: rgba(212,175,55,0.08);
+  color: #D4AF37;
+  border-color: rgba(212,175,55,0.4);
+}
+.btn-logout-confirm {
+  flex: 1;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, #D4AF37, #8B6914);
+  border: none;
+  border-radius: 10px;
+  color: #1A1510;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.btn-logout-confirm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes wave { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(15deg); } }
+
 @media (max-width: 900px) {
   .mobile-toggle { display: flex; }
 
@@ -225,4 +309,101 @@
     background: rgba(255,255,255,0.03);
     margin-top: 0.25rem;
   }
+}
+
+/* ── Theme Toggle Button ──────────────────────────── */
+.theme-toggle-btn {
+  background: rgba(212,175,55,0.1);
+  border: 1px solid rgba(212,175,55,0.3);
+  color: #D4AF37;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+  margin-left: 0.25rem;
+}
+.theme-toggle-btn:hover {
+  background: rgba(212,175,55,0.2);
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: 0 0 12px rgba(212,175,55,0.3);
+}
+
+/* ── Favourites Nav Link ────────────────────────────── */
+.fav-nav-link {
+  position: relative;
+}
+.fav-count-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #D4AF37;
+  color: #1a1208;
+  border-radius: 50%;
+  width: 17px;
+  height: 17px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT MODE — Navbar overrides
+   ══════════════════════════════════════════════════════════ */
+:host-context(body.light-mode) .navbar { background: rgba(255,255,255,0.97) !important; }
+:host-context(body.light-mode) .navbar.scrolled {
+  background: rgba(255,255,255,0.98) !important;
+  border-bottom: 1px solid rgba(15,23,42,0.1) !important;
+  box-shadow: 0 2px 16px rgba(15,23,42,0.08) !important;
+}
+:host-context(body.light-mode) .brand-name { color: #0F172A !important; }
+:host-context(body.light-mode) .nav-link { color: #334155 !important; }
+:host-context(body.light-mode) .nav-link:hover,
+:host-context(body.light-mode) .nav-link.active { color: #B8960C !important; background: rgba(184,150,12,0.08) !important; }
+:host-context(body.light-mode) .nav-link.active::after { background: #B8960C !important; }
+:host-context(body.light-mode) .dropdown-menu {
+  background: #FFFFFF !important;
+  border-color: rgba(15,23,42,0.12) !important;
+  box-shadow: 0 20px 40px rgba(15,23,42,0.15) !important;
+}
+:host-context(body.light-mode) .dropdown-item { color: #334155 !important; }
+:host-context(body.light-mode) .dropdown-item:hover { background: rgba(184,150,12,0.08) !important; color: #B8960C !important; }
+:host-context(body.light-mode) .nav-user {
+  background: rgba(184,150,12,0.08) !important;
+  border-color: rgba(184,150,12,0.2) !important;
+}
+:host-context(body.light-mode) .user-name { color: #B8960C !important; }
+:host-context(body.light-mode) .mobile-toggle span { background: #0F172A !important; }
+:host-context(body.light-mode) .nav-links.mobile-open {
+  background: rgba(255,255,255,0.98) !important;
+  border-bottom-color: rgba(15,23,42,0.1) !important;
+}
+
+/* Logout modal in light mode: keep dark for contrast */
+:host-context(body.light-mode) .logout-overlay { background: rgba(15,23,42,0.5) !important; }
+:host-context(body.light-mode) .logout-modal {
+  background: linear-gradient(145deg, #1E293B, #0F172A) !important;
+  border-color: rgba(212,175,55,0.3) !important;
+}
+:host-context(body.light-mode) .logout-title { color: #F8FAFC !important; }
+:host-context(body.light-mode) .logout-subtitle { color: #94A3B8 !important; }
+:host-context(body.light-mode) .btn-logout-cancel { color: #CBD5E1 !important; border-color: rgba(212,175,55,0.3) !important; background: rgba(255,255,255,0.05) !important; }
+:host-context(body.light-mode) .btn-logout-cancel:hover { color: #F8FAFC !important; }
+
+/* Theme toggle in light mode */
+:host-context(body.light-mode) .theme-toggle-btn {
+  background: #F1F5F9 !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  color: #0F172A !important;
+}
+:host-context(body.light-mode) .theme-toggle-btn:hover {
+  background: #E2E8F0 !important;
+  box-shadow: 0 0 12px rgba(15,23,42,0.1) !important;
 }

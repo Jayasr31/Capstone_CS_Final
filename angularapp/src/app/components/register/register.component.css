@@ -166,3 +166,119 @@
 }
 .login-link a { color: #D4AF37; text-decoration: none; font-weight: 600; margin-left: 0.25rem; }
 .login-link a:hover { text-decoration: underline; }
+
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.strength-fill.weak    { width: 33%; background: #e74c3c; }
+.strength-fill.strong  { width: 66%; background: #f39c12; }
+.strength-fill.very-strong { width: 100%; background: #2ecc71; }
+.strength-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+}
+.strength-label.weak        { color: #e74c3c; }
+.strength-label.strong      { color: #f39c12; }
+.strength-label.very-strong { color: #2ecc71; }
+
+.input-match    { border-color: #2ecc71 !important; }
+.input-mismatch { border-color: #e74c3c !important; }
+
+.confirm-icon {
+  position: absolute;
+  right: 1rem;
+  font-size: 1rem;
+  pointer-events: none;
+}
+.confirm-icon.match    { color: #2ecc71; }
+.confirm-icon.mismatch { color: #e74c3c; }
+
+.confirm-msg {
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.confirm-msg.match    { color: #2ecc71; }
+.confirm-msg.mismatch { color: #e74c3c; }
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT MODE — Register page overrides
+   ══════════════════════════════════════════════════════════ */
+:host-context(body.light-mode) .register-page {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%) !important;
+}
+:host-context(body.light-mode) .register-container {
+  background: #FFFFFF !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  box-shadow: 0 20px 60px rgba(15,23,42,0.2) !important;
+}
+:host-context(body.light-mode) .register-header h2 { color: #0F172A !important; }
+:host-context(body.light-mode) .register-header p { color: #475569 !important; }
+:host-context(body.light-mode) .back-btn { color: #64748B !important; background: #F1F5F9 !important; border-color: rgba(15,23,42,0.12) !important; }
+:host-context(body.light-mode) .back-btn:hover { color: #B8960C !important; border-color: rgba(184,150,12,0.4) !important; }
+:host-context(body.light-mode) .admin-key-field { background: #FFFBEB !important; border-color: rgba(180,140,10,0.2) !important; }
+:host-context(body.light-mode) .admin-hint { color: #475569 !important; }
+:host-context(body.light-mode) .admin-hint code { background: rgba(180,140,10,0.1) !important; color: #B8960C !important; }
+:host-context(body.light-mode) .hint-badge { background: rgba(180,140,10,0.15) !important; color: #92400E !important; }
+:host-context(body.light-mode) .login-link { color: #475569 !important; }
+:host-context(body.light-mode) .login-link a { color: #B8960C !important; }
+:host-context(body.light-mode) .toggle-password { color: #64748B !important; }
+:host-context(body.light-mode) .toggle-password:hover { color: #B8960C !important; }
+:host-context(body.light-mode) .strength-bar { background: rgba(15,23,42,0.1) !important; }
+
+/* ── Page-level theme toggle ───────────────────────── */
+.page-theme-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 100;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.12);
+  border: 1.5px solid rgba(212,175,55,0.35);
+  color: #D4AF37;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.page-theme-toggle:hover {
+  background: rgba(212,175,55,0.22);
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: 0 0 16px rgba(212,175,55,0.35);
+}
+:host-context(body.light-mode) .page-theme-toggle {
+  background: rgba(255,255,255,0.9) !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  color: #B8960C !important;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.15) !important;
+}
+:host-context(body.light-mode) .page-theme-toggle:hover {
+  background: #FFFBEB !important;
+  border-color: #B8960C !important;
+}

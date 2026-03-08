@@ -11,7 +11,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
-import { AdminDashboardComponent, CustomerDashboardComponent } from './components/admin-dashboard/dashboard.component';
+import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
+import { CustomerDashboardComponent } from './components/customer-dashboard/customer-dashboard.component';
 import { AdminAddPartyHallComponent } from './components/admin-add-party-hall/admin-add-party-hall.component';
 import { AdminViewPartyHallComponent } from './components/admin-view-party-hall/admin-view-party-hall.component';
 import { AdminViewBookingComponent } from './components/admin-view-booking/admin-view-booking.component';
@@ -20,9 +21,11 @@ import { CustomerViewBookingComponent } from './components/customer-view-booking
 import { AddReviewComponent } from './components/add-review/add-review.component';
 import { DeveloperComponent } from './components/developer/developer.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { ChatbotComponent } from './components/chatbot/chatbot.component';
 
 // Pipes
 import { StatusCountPipe } from './pipes/status-count.pipe';
+import { SafePipe } from './pipes/safe.pipe';
 
 @NgModule({
   declarations: [
@@ -41,7 +44,9 @@ import { StatusCountPipe } from './pipes/status-count.pipe';
     AddReviewComponent,
     DeveloperComponent,
     NotFoundComponent,
-    StatusCountPipe
+    ChatbotComponent,
+    StatusCountPipe,
+    SafePipe
   ],
   imports: [
     BrowserModule,

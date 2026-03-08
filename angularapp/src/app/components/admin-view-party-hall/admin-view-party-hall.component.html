@@ -8,9 +8,19 @@
   <div class="container" style="padding-bottom: 4rem;">
     <div class="page-actions">
       <div class="halls-count" *ngIf="!isLoading">{{ halls.length }} Party Halls</div>
-      <a class="btn-gold" routerLink="/admin/add-party-hall">
-        <i class="fas fa-plus"></i> Add New Hall
-      </a>
+      <div class="right-actions">
+        <div class="view-toggle">
+          <button class="toggle-btn" [class.active]="viewMode === 'table'" (click)="viewMode = 'table'" title="Table View">
+            <i class="fas fa-list"></i>
+          </button>
+          <button class="toggle-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'" title="Grid View">
+            <i class="fas fa-th-large"></i>
+          </button>
+        </div>
+        <a class="btn-gold" routerLink="/admin/add-party-hall">
+          <i class="fas fa-plus"></i> Add New Hall
+        </a>
+      </div>
     </div>
 
     <div class="alert alert-success" *ngIf="successMsg"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
@@ -21,7 +31,8 @@
       <p>Loading party halls...</p>
     </div>
 
-    <div class="table-wrapper" *ngIf="!isLoading">
+    <!-- TABLE VIEW -->
+    <div class="table-wrapper" *ngIf="!isLoading && viewMode === 'table'">
       <table>
         <thead>
           <tr>
@@ -31,75 +42,64 @@
             <th>Capacity</th>
             <th>Status</th>
             <th>Theme</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let hall of halls">
-            <!-- Normal view -->
-            <ng-container *ngIf="editingId !== hall.partyHallId">
-              <td>
-                <div class="hall-cell">
-                  <img [src]="hall.hallImageUrl || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=80'"
-                       [alt]="hall.hallName" class="hall-thumb" onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=80'">
-                  <span>{{ hall.hallName }}</span>
-                </div>
-              </td>
-              <td>{{ hall.hallLocation }}</td>
-              <td>₹{{ hall.price | number }}</td>
-              <td>{{ hall.capacity }}</td>
-              <td>
-                <span class="badge" [class.badge-success]="hall.hallAvailableStatus === 'Available'" [class.badge-danger]="hall.hallAvailableStatus !== 'Available'">
-                  {{ hall.hallAvailableStatus }}
-                </span>
-              </td>
-              <td>{{ hall.theme || '—' }}</td>
-              <td>
-                <div class="action-btns">
-                  <button class="btn-icon edit-btn" (click)="startEdit(hall)" title="Edit">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn-icon delete-btn" (click)="confirmDelete(hall.partyHallId!)" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Edit view -->
-            <ng-container *ngIf="editingId === hall.partyHallId">
-              <td><input type="text" class="edit-input" [(ngModel)]="editData.hallName"></td>
-              <td><input type="text" class="edit-input" [(ngModel)]="editData.hallLocation"></td>
-              <td><input type="number" class="edit-input" [(ngModel)]="editData.price"></td>
-              <td><input type="number" class="edit-input" [(ngModel)]="editData.capacity"></td>
-              <td>
-                <select class="edit-input" [(ngModel)]="editData.hallAvailableStatus">
-                  <option value="Available">Available</option>
-                  <option value="Not Available">Not Available</option>
-                </select>
-              </td>
-              <td>
-                <select class="edit-input" [(ngModel)]="editData.theme">
-                  <option value="">None</option>
-                  <option *ngFor="let t of themes" [value]="t">{{ t }}</option>
-                </select>
-              </td>
-              <td>
-                <div class="action-btns">
-                  <button class="btn-icon save-btn" (click)="saveEdit()" title="Save">
-                    <i class="fas fa-check"></i>
-                  </button>
-                  <button class="btn-icon cancel-btn" (click)="cancelEdit()" title="Cancel">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
+          <tr *ngFor="let hall of halls" class="clickable-row" (click)="openHallDetail(hall)">
+            <td>
+              <div class="hall-cell">
+                <img [src]="hall.hallImageUrl || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=80'"
+                     [alt]="hall.hallName" class="hall-thumb"
+                     onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=80'">
+                <span>{{ hall.hallName }}</span>
+              </div>
+            </td>
+            <td>{{ hall.hallLocation }}</td>
+            <td>₹{{ hall.price | number }}</td>
+            <td>{{ hall.capacity }}</td>
+            <td>
+              <span class="badge"
+                [class.badge-success]="hall.hallAvailableStatus === 'Available'"
+                [class.badge-danger]="hall.hallAvailableStatus !== 'Available'">
+                {{ hall.hallAvailableStatus }}
+              </span>
+            </td>
+            <td>{{ hall.theme || '—' }}</td>
           </tr>
         </tbody>
       </table>
-
       <div class="empty-state" *ngIf="halls.length === 0">
+        <div class="empty-icon">🏛️</div>
+        <h3>No party halls yet</h3>
+        <a routerLink="/admin/add-party-hall" class="btn-gold" style="display:inline-block; margin-top:1rem">Add First Hall</a>
+      </div>
+      <p class="click-hint" *ngIf="halls.length > 0"><i class="fas fa-hand-pointer"></i> Click any row to view details &amp; edit</p>
+    </div>
+
+    <!-- GRID VIEW -->
+    <div class="halls-grid" *ngIf="!isLoading && viewMode === 'grid'">
+      <div class="hall-card" *ngFor="let hall of halls" (click)="openHallDetail(hall)">
+        <div class="card-image-wrap">
+          <img [src]="hall.hallImageUrl || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400'"
+               [alt]="hall.hallName" class="card-image"
+               onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=400'">
+          <span class="card-badge"
+            [class.badge-success]="hall.hallAvailableStatus === 'Available'"
+            [class.badge-danger]="hall.hallAvailableStatus !== 'Available'">
+            {{ hall.hallAvailableStatus }}
+          </span>
+          <span class="card-theme-tag" *ngIf="hall.theme">{{ hall.theme }}</span>
+        </div>
+        <div class="card-body">
+          <h4 class="card-name">{{ hall.hallName }}</h4>
+          <p class="card-location"><i class="fas fa-map-marker-alt"></i> {{ hall.hallLocation }}</p>
+          <div class="card-stats">
+            <span><i class="fas fa-tag"></i> ₹{{ hall.price | number }}/day</span>
+            <span><i class="fas fa-users"></i> {{ hall.capacity }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="halls.length === 0" style="grid-column:1/-1;">
         <div class="empty-icon">🏛️</div>
         <h3>No party halls yet</h3>
         <a routerLink="/admin/add-party-hall" class="btn-gold" style="display:inline-block; margin-top:1rem">Add First Hall</a>
@@ -107,7 +107,105 @@
     </div>
   </div>
 
-  <!-- Delete Confirm Modal -->
+  <!-- HALL DETAIL POPUP -->
+  <div class="modal-backdrop" *ngIf="selectedHall" (click)="closeHallDetail()">
+    <div class="modal-box detail-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeHallDetail()"><i class="fas fa-times"></i></button>
+      <div class="detail-image-wrap">
+        <img [src]="selectedHall.hallImageUrl" [alt]="selectedHall.hallName" class="detail-image"
+             onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=600'">
+        <span class="card-badge detail-status-badge"
+          [class.badge-success]="selectedHall.hallAvailableStatus === 'Available'"
+          [class.badge-danger]="selectedHall.hallAvailableStatus !== 'Available'">
+          {{ selectedHall.hallAvailableStatus }}
+        </span>
+      </div>
+      <div class="detail-body">
+        <h3 class="detail-name">{{ selectedHall.hallName }}</h3>
+        <p class="detail-location"><i class="fas fa-map-marker-alt"></i> {{ selectedHall.hallLocation }}</p>
+        <div class="detail-meta-row">
+          <div class="detail-meta-item">
+            <span class="meta-label">Price/Day</span>
+            <span class="meta-value gold">₹{{ selectedHall.price | number }}</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="meta-label">Capacity</span>
+            <span class="meta-value">{{ selectedHall.capacity }} guests</span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="meta-label">Theme</span>
+            <span class="meta-value">{{ selectedHall.theme || '—' }}</span>
+          </div>
+        </div>
+        <p class="detail-desc" *ngIf="selectedHall.description">{{ selectedHall.description }}</p>
+        <div class="detail-actions">
+          <button class="btn-edit-detail" (click)="openEdit()">
+            <i class="fas fa-edit"></i> Edit Hall
+          </button>
+          <button class="btn-delete-detail" (click)="confirmDelete(selectedHall.partyHallId!)">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-backdrop" *ngIf="showEditModal" (click)="closeEdit()">
+    <div class="modal-box edit-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeEdit()"><i class="fas fa-times"></i></button>
+      <h3 class="modal-title"><i class="fas fa-edit"></i> Edit Party Hall</h3>
+      <div class="edit-form-grid">
+        <div class="edit-field">
+          <label>Hall Name</label>
+          <input type="text" class="edit-input" [(ngModel)]="editData.hallName" placeholder="Hall name">
+        </div>
+        <div class="edit-field">
+          <label>Location</label>
+          <input type="text" class="edit-input" [(ngModel)]="editData.hallLocation" placeholder="Location">
+          <label class="edit-label" style="margin-top:0.6rem"><i class="fas fa-map-marker-alt" style="color:#D4AF37"></i> Full Address <span style="font-size:0.75rem; opacity:0.6">(Google Maps pin)</span></label>
+          <input type="text" class="edit-input" [(ngModel)]="editData.fullAddress" placeholder="e.g., 12 Linking Road, Bandra West, Mumbai 400050">
+        </div>
+        <div class="edit-field">
+          <label>Price per Day (₹)</label>
+          <input type="number" class="edit-input" [(ngModel)]="editData.price" placeholder="Price">
+        </div>
+        <div class="edit-field">
+          <label>Capacity</label>
+          <input type="number" class="edit-input" [(ngModel)]="editData.capacity" placeholder="Capacity">
+        </div>
+        <div class="edit-field">
+          <label>Status</label>
+          <select class="edit-input" [(ngModel)]="editData.hallAvailableStatus">
+            <option value="Available">Available</option>
+            <option value="Not Available">Not Available</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>Theme</label>
+          <select class="edit-input" [(ngModel)]="editData.theme">
+            <option value="">— None —</option>
+            <option *ngFor="let t of themes" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+        <div class="edit-field full-width">
+          <label>Image URL</label>
+          <input type="text" class="edit-input" [(ngModel)]="editData.hallImageUrl" placeholder="https://...">
+        </div>
+        <div class="edit-field full-width">
+          <label>Description</label>
+          <textarea class="edit-input edit-textarea" [(ngModel)]="editData.description" placeholder="Short description..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="alert alert-error" *ngIf="errorMsg" style="margin-top:0.75rem;"><i class="fas fa-exclamation-circle"></i> {{ errorMsg }}</div>
+      <div class="edit-modal-actions">
+        <button class="btn-outline-gold" (click)="closeEdit()">Cancel</button>
+        <button class="btn-gold" (click)="saveEdit()"><i class="fas fa-check"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM MODAL -->
   <div class="modal-backdrop" *ngIf="showDeleteConfirm">
     <div class="modal-box" style="max-width:400px; text-align:center;">
       <div style="font-size:3rem; margin-bottom:1rem;">🗑️</div>

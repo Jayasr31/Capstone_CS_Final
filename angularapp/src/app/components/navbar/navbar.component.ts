@@ -1,6 +1,8 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
+import { FavouritesService } from '../../services/favourites.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,11 +13,17 @@ export class NavbarComponent implements OnInit {
   isScrolled = false;
   showHallMenu = false;
   showMobileMenu = false;
+  showLogoutModal = false;
   isLoggedIn = false;
   userRole = '';
   username = '';
 
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(
+    public authService: AuthService,
+    public themeService: ThemeService,
+    public favouritesService: FavouritesService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.isLoggedIn();
@@ -29,10 +37,17 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    if (confirm('Are you sure you want to logout?')) {
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
+    this.showLogoutModal = true;
+  }
+
+  confirmLogout(): void {
+    this.showLogoutModal = false;
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  cancelLogout(): void {
+    this.showLogoutModal = false;
   }
 
   toggleMobileMenu(): void {

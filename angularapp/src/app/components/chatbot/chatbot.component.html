@@ -1,0 +1,86 @@
+<!-- Floating Chat Button -->
+<button class="chat-toggle-btn" (click)="toggleChat()" [class.open]="isOpen" title="Chat with us">
+  <i class="fas" [class.fa-comments]="!isOpen" [class.fa-times]="isOpen"></i>
+  <span class="chat-badge" *ngIf="!isOpen">?</span>
+</button>
+
+<!-- Chat Window -->
+<div class="chat-window" [class.chat-window-open]="isOpen">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="bot-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="chat-header-info">
+        <div class="bot-name">CelebrateSpot Assistant</div>
+        <div class="bot-status"><span class="status-dot"></span> Online</div>
+      </div>
+    </div>
+    <button class="chat-close-btn" (click)="toggleChat()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Messages Body -->
+  <div class="chat-body" #chatBody>
+    <ng-container *ngFor="let msg of messages">
+      <!-- Bot Message -->
+      <div class="message-row bot-row" *ngIf="msg.from === 'bot'">
+        <div class="msg-avatar bot-msg-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="msg-content bot-msg">
+          <div class="msg-text">{{ msg.text }}</div>
+          <div class="msg-time">{{ msg.time }}</div>
+        </div>
+      </div>
+
+      <!-- User Message -->
+      <div class="message-row user-row" *ngIf="msg.from === 'user'">
+        <div class="msg-content user-msg">
+          <div class="msg-text">{{ msg.text }}</div>
+          <div class="msg-time">{{ msg.time }}</div>
+        </div>
+        <div class="msg-avatar user-msg-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Typing Indicator -->
+    <div class="message-row bot-row" *ngIf="isTyping">
+      <div class="msg-avatar bot-msg-avatar">
+        <i class="fas fa-robot"></i>
+      </div>
+      <div class="msg-content bot-msg typing-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Replies -->
+  <div class="quick-replies">
+    <button class="quick-reply-btn"
+            *ngFor="let qr of quickReplies"
+            (click)="sendMessage(qr.query)">
+      {{ qr.label }}
+    </button>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input-area">
+    <input
+      class="chat-input"
+      type="text"
+      [(ngModel)]="userInput"
+      placeholder="Type a message..."
+      (keydown)="onKeyDown($event)"
+      maxlength="200">
+    <button class="chat-send-btn" (click)="sendMessage()" [disabled]="!userInput.trim()">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>

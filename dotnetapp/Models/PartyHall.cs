@@ -16,6 +16,7 @@ namespace dotnetapp.Models
         // Additional fields for enhanced UI
         public string Theme { get; set; } = string.Empty;
         public string AdditionalImages { get; set; } = string.Empty; // JSON array of image URLs
+        public string FullAddress { get; set; } = string.Empty; // Full street address for Google Maps
         public ICollection<Booking>? Bookings { get; set; }
     }
 }

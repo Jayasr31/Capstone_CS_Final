@@ -5,7 +5,7 @@ namespace dotnetapp.Models
     public class Booking
     {
         [Key]
-        public long? BookingId { get; set; }
+        public long BookingId { get; set; }
         public int NoOfPersons { get; set; }
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }

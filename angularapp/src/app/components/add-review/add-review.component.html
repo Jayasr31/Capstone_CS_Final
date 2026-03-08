@@ -42,6 +42,14 @@
           <div class="alert alert-error" *ngIf="errorMsg"><i class="fas fa-exclamation-circle"></i> {{ errorMsg }}</div>
 
           <div class="form-group">
+            <label class="form-label">Select Party Hall *</label>
+            <select class="form-control" [(ngModel)]="review.partyHallId">
+              <option [ngValue]="undefined" disabled>-- Choose a party hall --</option>
+              <option *ngFor="let h of halls" [ngValue]="h.partyHallId">{{ h.hallName }} — {{ h.hallLocation }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label class="form-label">Your Rating *</label>
             <div class="star-picker">
               <span
@@ -82,6 +90,7 @@
               </div>
               <div class="review-date">{{ r.dateCreated | date:'dd MMM yyyy' }}</div>
             </div>
+            <div class="review-hall-tag" *ngIf="r.partyHallId">🏛 Hall #{{ r.partyHallId }}</div>
             <h4 class="review-subject">{{ r.subject }}</h4>
             <p class="review-body">{{ r.body }}</p>
           </div>

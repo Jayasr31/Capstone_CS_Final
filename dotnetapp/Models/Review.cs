@@ -7,10 +7,12 @@ namespace dotnetapp.Models
         [Key]
         public int ReviewId { get; set; }
         public long UserId { get; set; }
+        public long? PartyHallId { get; set; }
         public string Subject { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
         public int Rating { get; set; }
         public DateTime DateCreated { get; set; }
         public User? User { get; set; }
+        public PartyHall? PartyHall { get; set; }
     }
 }

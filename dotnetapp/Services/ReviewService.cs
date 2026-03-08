@@ -38,5 +38,15 @@ namespace dotnetapp.Services
                 .Where(r => r.UserId == userId)
                 .ToListAsync();
         }
+
+        /// <summary>Retrieves all reviews for a specific party hall</summary>
+        public async Task<IEnumerable<Review>> GetReviewsByPartyHallIdAsync(long partyHallId)
+        {
+            return await _context.Reviews
+                .Include(r => r.User)
+                .Where(r => r.PartyHallId == partyHallId)
+                .OrderByDescending(r => r.DateCreated)
+                .ToListAsync();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using dotnetapp.Data;
+using dotnetapp.Exceptions;
 using dotnetapp.Models;
 
 namespace dotnetapp.Services
@@ -41,9 +42,35 @@ namespace dotnetapp.Services
                 .ToListAsync();
         }
 
-        /// <summary>Adds a new booking to the database</summary>
+        /// <summary>Adds a new booking to the database with capacity and date validation</summary>
         public async Task<Booking> AddBookingAsync(Booking booking)
         {
+            // Past date check
+            if (booking.FromDate.Date < DateTime.Today)
+                throw new PartyHallException("Booking date cannot be in the past.");
+
+            if (booking.ToDate.Date < booking.FromDate.Date)
+                throw new PartyHallException("End date must be on or after the start date.");
+
+            // Capacity check — sum persons in overlapping non-cancelled bookings
+            var hall = await _context.PartyHalls.FindAsync(booking.PartyHallId);
+            if (hall == null)
+                throw new PartyHallException("Party hall not found.");
+
+            if (hall.HallAvailableStatus != "Available")
+                throw new PartyHallException("This party hall is not available for booking.");
+
+            var overlappingPersons = await _context.Bookings
+                .Where(b => b.PartyHallId == booking.PartyHallId
+                         && b.Status != "Cancelled"
+                         && b.FromDate.Date <= booking.ToDate.Date
+                         && b.ToDate.Date >= booking.FromDate.Date)
+                .SumAsync(b => (int?)b.NoOfPersons) ?? 0;
+
+            if (overlappingPersons + booking.NoOfPersons > hall.Capacity)
+                throw new PartyHallException(
+                    $"Booking exceeds hall capacity. Available capacity for selected dates: {hall.Capacity - overlappingPersons} persons.");
+
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();
             return booking;

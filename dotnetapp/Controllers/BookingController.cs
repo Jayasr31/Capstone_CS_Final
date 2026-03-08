@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using dotnetapp.Exceptions;
 using dotnetapp.Models;
 using dotnetapp.Services;
 
@@ -75,8 +76,9 @@ namespace dotnetapp.Controllers
                 if (booking == null)
                     return BadRequest(new { message = "Booking data is null." });
 
-                // Avoid navigation property conflicts
+                // Null out navigation properties to avoid EF Core int/long tracking conflicts
                 booking.User = null;
+                booking.PartyHall = null;
 
                 var addedBooking = await _bookingService.AddBookingAsync(booking);
 
@@ -85,6 +87,10 @@ namespace dotnetapp.Controllers
                     return BadRequest(new { message = "User not found." });
 
                 return Ok(new { booking = addedBooking, user });
+            }
+            catch (PartyHallException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {

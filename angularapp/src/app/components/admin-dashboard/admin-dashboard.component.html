@@ -1,0 +1,183 @@
+<div class="dashboard-page">
+  <!-- Welcome Header -->
+  <section class="dash-hero">
+    <div class="dash-hero-bg">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+    </div>
+    <div class="dash-hero-content">
+      <div class="welcome-badge">🎉 Admin Panel</div>
+      <h1>Welcome back, <span class="name-gold">{{ username }}</span></h1>
+      <p>Here's what's happening with CelebrateSpot today</p>
+    </div>
+    <div class="dash-hero-actions">
+      <button class="btn-gold" (click)="navigate('/admin/add-party-hall')">
+        <i class="fas fa-plus"></i> Add Party Hall
+      </button>
+      <button class="btn-outline-gold" (click)="navigate('/admin/view-party-hall')">
+        <i class="fas fa-th-large"></i> View Halls
+      </button>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <div class="container dash-content" *ngIf="!isLoading">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0s" (click)="navigate('/admin/view-party-hall')">
+        <div class="stat-icon-wrap">
+          <span class="stat-icon">🏛️</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalHalls }}</div>
+          <div class="stat-label">Total Halls</div>
+        </div>
+        <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.1s">
+        <div class="stat-icon-wrap green">
+          <span class="stat-icon">✅</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.availableHalls }}</div>
+          <div class="stat-label">Available Halls</div>
+        </div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.15s" (click)="navigate('/admin/view-booking')">
+        <div class="stat-icon-wrap blue">
+          <span class="stat-icon">📅</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalBookings }}</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.2s">
+        <div class="stat-icon-wrap orange">
+          <span class="stat-icon">⏳</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.pendingBookings }}</div>
+          <div class="stat-label">Pending Bookings</div>
+        </div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.25s">
+        <div class="stat-icon-wrap green">
+          <span class="stat-icon">🎯</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.confirmedBookings }}</div>
+          <div class="stat-label">Confirmed</div>
+        </div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp revenue-card" style="animation-delay:0.3s">
+        <div class="stat-icon-wrap gold">
+          <span class="stat-icon">💰</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">₹{{ stats.totalRevenue | number }}</div>
+          <div class="stat-label">Total Revenue</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions + Recent Bookings -->
+    <div class="dash-grid">
+      <!-- Quick Actions -->
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+        </div>
+        <div class="quick-actions">
+          <button class="qa-btn" (click)="navigate('/admin/add-party-hall')">
+            <span class="qa-icon">➕</span>
+            <span>Add Party Hall</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/admin/view-party-hall')">
+            <span class="qa-icon">🏛️</span>
+            <span>Manage Halls</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/admin/view-booking')">
+            <span class="qa-icon">📋</span>
+            <span>View Bookings</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/admin/reviews')">
+            <span class="qa-icon">⭐</span>
+            <span>View Reviews</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/home')">
+            <span class="qa-icon">🏠</span>
+            <span>Home Page</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/developer')">
+            <span class="qa-icon">💻</span>
+            <span>Developers</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="dash-card recent-card">
+        <div class="card-header">
+          <h2><i class="fas fa-history"></i> Recent Bookings</h2>
+          <button class="btn-link" (click)="navigate('/admin/view-booking')">View All →</button>
+        </div>
+
+        <div class="empty-state-sm" *ngIf="recentBookings.length === 0">
+          <p>No bookings yet</p>
+        </div>
+
+        <div class="recent-list" *ngIf="recentBookings.length > 0">
+          <div class="recent-item" *ngFor="let b of recentBookings">
+            <div class="ri-avatar">{{ (b.user?.username || 'U').charAt(0).toUpperCase() }}</div>
+            <div class="ri-info">
+              <div class="ri-name">{{ b.user?.username || 'Customer' }}</div>
+              <div class="ri-hall">{{ b.partyHall?.hallName || 'Hall' }}</div>
+              <div class="ri-date">{{ b.fromDate | date:'dd MMM yyyy' }} → {{ b.toDate | date:'dd MMM yyyy' }}</div>
+            </div>
+            <div class="ri-right">
+              <span class="badge" [class]="getStatusClass(b.status)">{{ b.status }}</span>
+              <div class="ri-price">₹{{ b.totalPrice | number }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hall Status Overview -->
+    <div class="dash-card halls-overview" *ngIf="halls.length > 0">
+      <div class="card-header">
+        <h2><i class="fas fa-th-large"></i> Hall Overview</h2>
+        <button class="btn-link" (click)="navigate('/admin/view-party-hall')">Manage →</button>
+      </div>
+      <div class="halls-mini-grid">
+        <div class="hall-mini-card" *ngFor="let hall of halls.slice(0, 6)">
+          <div class="hm-image">
+            <img [src]="hall.hallImageUrl || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=200'"
+                 [alt]="hall.hallName"
+                 onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=200'">
+            <div class="hm-status" [class.available]="hall.hallAvailableStatus === 'Available'">
+              {{ hall.hallAvailableStatus }}
+            </div>
+          </div>
+          <div class="hm-info">
+            <div class="hm-name">{{ hall.hallName }}</div>
+            <div class="hm-loc"><i class="fas fa-map-marker-alt"></i> {{ hall.hallLocation }}</div>
+            <div class="hm-price">₹{{ hall.price | number }}/day · {{ hall.capacity }} guests</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

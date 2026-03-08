@@ -212,3 +212,67 @@
   .login-left { display: none; }
   .login-right { padding: 2rem 1.5rem; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   LIGHT MODE — Login/Register page overrides
+   ══════════════════════════════════════════════════════════ */
+:host-context(body.light-mode) .login-page {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 50%, #1a2744 100%) !important;
+}
+:host-context(body.light-mode) .login-left {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02)) !important;
+  border-right-color: rgba(212,175,55,0.2) !important;
+}
+:host-context(body.light-mode) .logo-area p { color: #CBD5E1 !important; }
+:host-context(body.light-mode) .feature-item h4 { color: #F8FAFC !important; }
+:host-context(body.light-mode) .feature-item p { color: #94A3B8 !important; }
+:host-context(body.light-mode) .feature-icon { background: rgba(212,175,55,0.12) !important; border-color: rgba(212,175,55,0.2) !important; }
+
+:host-context(body.light-mode) .login-card {
+  background: #FFFFFF !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  box-shadow: 0 20px 60px rgba(15,23,42,0.2) !important;
+}
+:host-context(body.light-mode) .card-header h2 { color: #0F172A !important; }
+:host-context(body.light-mode) .card-header p { color: #475569 !important; }
+:host-context(body.light-mode) .toggle-password { color: #64748B !important; }
+:host-context(body.light-mode) .toggle-password:hover { color: #B8960C !important; }
+:host-context(body.light-mode) .register-link { color: #475569 !important; }
+:host-context(body.light-mode) .register-link a { color: #B8960C !important; }
+
+/* ── Page-level theme toggle ──────────────────────── */
+.page-theme-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 100;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.12);
+  border: 1.5px solid rgba(212,175,55,0.35);
+  color: #D4AF37;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.page-theme-toggle:hover {
+  background: rgba(212,175,55,0.22);
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: 0 0 16px rgba(212,175,55,0.35);
+}
+:host-context(body.light-mode) .page-theme-toggle {
+  background: rgba(255,255,255,0.9) !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  color: #B8960C !important;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.15) !important;
+}
+:host-context(body.light-mode) .page-theme-toggle:hover {
+  background: #FFFBEB !important;
+  border-color: #B8960C !important;
+}

@@ -49,6 +49,21 @@ namespace dotnetapp.Controllers
             }
         }
 
+        /// <summary>Get reviews by hall ID (public for customers)</summary>
+        [HttpGet("hall/{hallId}")]
+        public async Task<IActionResult> GetReviewsByHallId(long hallId)
+        {
+            try
+            {
+                var reviews = await _reviewService.GetReviewsByPartyHallIdAsync(hallId);
+                return Ok(reviews);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
         /// <summary>Add a new review (Customer access)</summary>
         [HttpPost]
         public async Task<IActionResult> AddReview([FromBody] Review review)
@@ -58,9 +73,9 @@ namespace dotnetapp.Controllers
                 if (review == null)
                     return BadRequest(new { message = "Review data is null." });
 
-                // If user object provided but userId doesn't match, ignore user object
-                if (review.User != null && review.User.UserId != review.UserId)
-                    review.User = null;
+                // Always null navigation properties to avoid EF Core int/long tracking conflicts
+                review.User = null;
+                review.PartyHall = null;
 
                 var addedReview = await _reviewService.AddReviewAsync(review);
 

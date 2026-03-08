@@ -40,6 +40,11 @@
 
     <div class="results-count" *ngIf="!isLoading">
       <span>Showing <strong>{{ filteredHalls.length }}</strong> of {{ halls.length }} halls</span>
+      <button class="btn-fav-toggle" [class.active]="showFavouritesOnly" (click)="showFavouritesOnly = !showFavouritesOnly; applyFilters()">
+        <i [class]="showFavouritesOnly ? 'fas fa-heart' : 'far fa-heart'"></i>
+        {{ showFavouritesOnly ? 'Showing Favourites' : 'Show Favourites' }}
+        <span *ngIf="favouritesService.getAll().length > 0">({{ favouritesService.getAll().length }})</span>
+      </button>
     </div>
 
     <!-- Loading -->
@@ -69,6 +74,12 @@
             </span>
             <span class="badge-theme" *ngIf="hall.theme">{{ hall.theme }}</span>
           </div>
+          <!-- Favourite Button -->
+          <button class="btn-heart" [class.favourited]="favouritesService.isFavourite(hall.partyHallId ?? 0)"
+                  (click)="$event.stopPropagation(); favouritesService.toggle(hall.partyHallId ?? 0); applyFilters()"
+                  [title]="favouritesService.isFavourite(hall.partyHallId ?? 0) ? 'Remove from favourites' : 'Add to favourites'">
+            <i [class]="favouritesService.isFavourite(hall.partyHallId ?? 0) ? 'fas fa-heart' : 'far fa-heart'"></i>
+          </button>
         </div>
 
         <div class="hall-body">
@@ -105,21 +116,124 @@
     </div>
   </div>
 
-  <!-- Booking Modal -->
+  <!-- Hall Detail + Booking Modal -->
   <div class="modal-backdrop" *ngIf="showBookingModal" (click)="closeModal()">
-    <div class="modal-box booking-modal" (click)="$event.stopPropagation()">
+    <div class="modal-box booking-modal large-modal" (click)="$event.stopPropagation()">
+      <!-- Modal Header -->
       <div class="modal-header">
         <div>
-          <h3>Book {{ selectedHall?.hallName }}</h3>
-          <p>{{ selectedHall?.hallLocation }}</p>
+          <h3>{{ selectedHall?.hallName }}</h3>
+          <p>
+            <i class="fas fa-map-marker-alt"></i> {{ selectedHall?.hallLocation }}
+            <a class="btn-map-small" *ngIf="selectedHall" [href]="getMapUrl(selectedHall)" target="_blank" rel="noopener">
+              <i class="fas fa-map"></i> View on Map
+            </a>
+          </p>
         </div>
         <button class="close-btn" (click)="closeModal()"><i class="fas fa-times"></i></button>
       </div>
 
-      <div class="alert alert-error" *ngIf="errorMsg"><i class="fas fa-exclamation-circle"></i> {{ errorMsg }}</div>
-      <div class="alert alert-success" *ngIf="successMsg"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
+      <div class="modal-body-scrollable">
+        <!-- Hall Details Section -->
+        <div class="hall-detail-section">
+          <div class="hall-detail-image">
+            <img [src]="selectedHall?.hallImageUrl || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=500'"
+                 [alt]="selectedHall?.hallName"
+                 onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=500'">
+            <div class="hall-detail-badges">
+              <span class="badge-status" [class.available]="selectedHall?.hallAvailableStatus === 'Available'">{{ selectedHall?.hallAvailableStatus }}</span>
+              <span class="badge-theme" *ngIf="selectedHall?.theme">{{ selectedHall?.theme }}</span>
+            </div>
+          </div>
+          <div class="hall-detail-info">
+            <div class="detail-chips">
+              <div class="detail-chip">
+                <i class="fas fa-users"></i>
+                <span>Max <strong>{{ selectedHall?.capacity }}</strong> guests</span>
+              </div>
+              <div class="detail-chip">
+                <i class="fas fa-rupee-sign"></i>
+                <span><strong>₹{{ selectedHall?.price | number }}</strong>/day</span>
+              </div>
+              <div class="detail-chip">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>{{ selectedHall?.hallLocation }}</span>
+              </div>
+            </div>
+            <p class="hall-detail-desc" *ngIf="selectedHall?.description">{{ selectedHall?.description }}</p>
+            <div class="capacity-bar" *ngIf="selectedHall?.capacity">
+              <div class="capacity-label">
+                <span>Capacity</span>
+                <span>{{ booking.noOfPersons || 0 }} / {{ selectedHall?.capacity }} persons</span>
+              </div>
+              <div class="capacity-track">
+                <div class="capacity-fill"
+                     [style.width.%]="((booking.noOfPersons || 0) / (selectedHall?.capacity || 1)) * 100"
+                     [class.over-capacity]="(booking.noOfPersons || 0) > (selectedHall?.capacity || 0)">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <div class="modal-body">
+        <div class="modal-divider"><span>Location</span></div>
+
+        <!-- Google Maps Embed -->
+        <div class="map-embed-container" *ngIf="selectedHall">
+          <iframe
+            [src]="getMapEmbedUrl(selectedHall) | safe"
+            width="100%"
+            height="240"
+            style="border:0; border-radius:10px;"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+          <a class="btn-open-maps" [href]="getMapUrl(selectedHall)" target="_blank" rel="noopener">
+            <i class="fas fa-directions"></i> Open in Google Maps
+          </a>
+        </div>
+
+        <div class="modal-divider"><span>Booking Details</span></div>
+
+        <!-- Reviews Section -->
+        <div class="hall-reviews-section">
+          <div class="reviews-header-row">
+            <h4 class="reviews-heading"><i class="fas fa-star"></i> Customer Reviews</h4>
+            <div class="avg-rating" *ngIf="hallReviews.length">
+              <span class="avg-score">{{ hallAvgRating }}</span>
+              <span class="avg-stars">
+                <span *ngFor="let s of getStarArray(hallAvgRating)" [class]="s ? 'star filled' : 'star'">★</span>
+              </span>
+              <span class="avg-count">({{ hallReviews.length }})</span>
+            </div>
+          </div>
+          <div *ngIf="hallReviewsLoading" class="reviews-loading">Loading reviews...</div>
+          <div class="reviews-scroll" *ngIf="!hallReviewsLoading && hallReviews.length">
+            <div class="mini-review-card" *ngFor="let r of hallReviews">
+              <div class="mini-review-top">
+                <div class="mini-avatar">{{ (r.user?.username || 'U').charAt(0).toUpperCase() }}</div>
+                <div class="mini-meta">
+                  <span class="mini-user">{{ r.user?.username || 'Anonymous' }}</span>
+                  <span class="mini-date">{{ r.dateCreated | date:'dd MMM yyyy' }}</span>
+                </div>
+                <div class="mini-stars">
+                  <span *ngFor="let s of getStarArray(r.rating)" [class]="s ? 'star filled' : 'star'">★</span>
+                </div>
+              </div>
+              <p class="mini-subject">{{ r.subject }}</p>
+              <p class="mini-body">{{ r.body }}</p>
+            </div>
+          </div>
+          <div class="no-reviews" *ngIf="!hallReviewsLoading && !hallReviews.length">
+            <i class="fas fa-comment-slash"></i> No reviews yet for this hall.
+          </div>
+        </div>
+
+        <div class="alert alert-error" *ngIf="errorMsg"><i class="fas fa-exclamation-circle"></i> {{ errorMsg }}</div>
+        <div class="alert alert-success" *ngIf="successMsg"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
+
+        <!-- Booking Form -->
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">From Date *</label>
@@ -127,28 +241,85 @@
           </div>
           <div class="form-group">
             <label class="form-label">To Date *</label>
-            <input type="date" class="form-control" [(ngModel)]="booking.toDate" (change)="calculatePrice()" [min]="booking.fromDate">
+            <input type="date" class="form-control" [(ngModel)]="booking.toDate" (change)="calculatePrice()" [min]="booking.fromDate || today">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Number of Persons *</label>
-            <input type="number" class="form-control" [(ngModel)]="booking.noOfPersons" min="1" [max]="selectedHall?.capacity">
+            <label class="form-label">Number of Guests *
+              <span class="capacity-hint">(max {{ selectedHall?.capacity }})</span>
+            </label>
+            <input type="number" class="form-control" [(ngModel)]="booking.noOfPersons"
+                   min="1" [max]="selectedHall?.capacity ?? null"
+                   (input)="calculatePrice()"
+                   [class.input-error]="booking.noOfPersons > (selectedHall?.capacity || 9999)">
           </div>
           <div class="form-group">
-            <label class="form-label">Total Price</label>
+            <label class="form-label">Estimated Total</label>
             <div class="price-display">₹{{ booking.totalPrice | number }}</div>
+            <div class="price-note" *ngIf="booking.fromDate && booking.toDate">
+              Based on selected dates
+            </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Delivery Address *</label>
-          <textarea class="form-control" [(ngModel)]="booking.address" placeholder="Enter your complete address" rows="2"></textarea>
+          <label class="form-label">Billing / Event Address *</label>
+          <textarea class="form-control" [(ngModel)]="booking.address"
+                    placeholder="Enter your complete address for the booking..." rows="2"></textarea>
         </div>
 
-        <button class="btn-gold" style="width:100%" (click)="submitBooking()">
-          Confirm Booking <i class="fas fa-check"></i>
+        <!-- Coupon Section -->
+        <div class="coupon-section" *ngIf="booking.fromDate && booking.toDate">
+          <div class="coupon-header">
+            <i class="fas fa-tag"></i> Have a discount coupon?
+            <span class="coupon-hint">Try: CELEBRATE10 · PARTY15 · FIRSTBOOK20 · MONSOON30</span>
+          </div>
+          <div class="coupon-input-row" *ngIf="!appliedCoupon">
+            <input type="text" class="coupon-input" [(ngModel)]="couponCode"
+                   placeholder="Enter coupon code" (keyup.enter)="applyCoupon()">
+            <button class="btn-apply-coupon" (click)="applyCoupon()">Apply</button>
+          </div>
+          <div class="coupon-applied" *ngIf="appliedCoupon">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ appliedCoupon.label }}</span>
+            <span class="discount-badge">-{{ appliedCoupon.discount }}%</span>
+            <button class="btn-remove-coupon" (click)="removeCoupon()"><i class="fas fa-times"></i> Remove</button>
+          </div>
+          <div class="coupon-error" *ngIf="couponError"><i class="fas fa-exclamation-circle"></i> {{ couponError }}</div>
+        </div>
+
+        <div class="booking-summary" *ngIf="booking.fromDate && booking.toDate && booking.noOfPersons">
+          <div class="summary-row">
+            <span>Hall</span>
+            <strong>{{ selectedHall?.hallName }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Dates</span>
+            <strong>{{ booking.fromDate | date:'dd MMM yyyy' }} → {{ booking.toDate | date:'dd MMM yyyy' }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>Guests</span>
+            <strong>{{ booking.noOfPersons }}</strong>
+          </div>
+          <div class="summary-row original-price-row" *ngIf="appliedCoupon">
+            <span>Original Price</span>
+            <strong style="text-decoration:line-through; opacity:0.6">₹{{ booking.totalPrice | number }}</strong>
+          </div>
+          <div class="summary-row discount-row" *ngIf="appliedCoupon">
+            <span>Discount ({{ appliedCoupon.discount }}%)</span>
+            <strong class="discount-text">-₹{{ discountAmount | number }}</strong>
+          </div>
+          <div class="summary-row total-row">
+            <span>Total Amount</span>
+            <strong class="gold-text">₹{{ finalPrice | number }}</strong>
+          </div>
+        </div>
+
+        <button class="btn-gold" style="width:100%; margin-top:1rem" (click)="submitBooking()"
+                [disabled]="selectedHall?.hallAvailableStatus !== 'Available'">
+          <i class="fas fa-calendar-check"></i> Confirm Booking
         </button>
       </div>
     </div>

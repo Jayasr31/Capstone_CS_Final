@@ -1,4 +1,9 @@
 <div class="register-page">
+  <!-- Theme toggle -->
+  <button class="page-theme-toggle" (click)="theme.toggle()" [title]="theme.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+    <i class="fas" [class.fa-sun]="theme.isDark" [class.fa-moon]="!theme.isDark"></i>
+  </button>
+
   <div class="particles">
     <div class="particle" *ngFor="let p of [1,2,3,4,5,6,7,8]" [style.animation-delay]="(p * 0.4) + 's'"></div>
   </div>
@@ -42,10 +47,22 @@
         <label class="form-label">Password *</label>
         <div class="input-wrapper">
           <i class="fas fa-lock input-icon"></i>
-          <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="user.password" placeholder="Min. 6 characters" required>
+          <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="user.password"
+                 placeholder="Min. 6 characters" required
+                 (keydown.space)="$event.preventDefault()">
           <button class="toggle-password" (click)="showPassword = !showPassword" type="button">
             <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
           </button>
+        </div>
+        <div class="password-strength" *ngIf="user.password">
+          <div class="strength-bar">
+            <div class="strength-fill" [class]="passwordStrength"></div>
+          </div>
+          <span class="strength-label" [class]="passwordStrength">
+            <ng-container *ngIf="passwordStrength === 'weak'">Weak</ng-container>
+            <ng-container *ngIf="passwordStrength === 'strong'">Strong</ng-container>
+            <ng-container *ngIf="passwordStrength === 'very-strong'">Very Strong</ng-container>
+          </span>
         </div>
       </div>
 
@@ -53,8 +70,21 @@
         <label class="form-label">Confirm Password *</label>
         <div class="input-wrapper">
           <i class="fas fa-lock input-icon"></i>
-          <input [type]="showPassword ? 'text' : 'password'" class="form-control" [(ngModel)]="confirmPassword" placeholder="Re-enter password" required>
+          <input [type]="showPassword ? 'text' : 'password'" class="form-control"
+                 [class.input-match]="confirmPassword && user.password === confirmPassword"
+                 [class.input-mismatch]="confirmPassword && user.password !== confirmPassword"
+                 [(ngModel)]="confirmPassword"
+                 placeholder="Re-enter password" required
+                 (keydown.space)="$event.preventDefault()">
+          <i class="fas fa-check-circle confirm-icon match" *ngIf="confirmPassword && user.password === confirmPassword"></i>
+          <i class="fas fa-times-circle confirm-icon mismatch" *ngIf="confirmPassword && user.password !== confirmPassword"></i>
         </div>
+        <p class="confirm-msg match" *ngIf="confirmPassword && user.password === confirmPassword">
+          <i class="fas fa-check"></i> Passwords match
+        </p>
+        <p class="confirm-msg mismatch" *ngIf="confirmPassword && user.password !== confirmPassword">
+          <i class="fas fa-times"></i> Passwords do not match
+        </p>
       </div>
 
       <div class="form-group">
@@ -89,7 +119,7 @@
       </div>
       <p class="admin-hint">
         <i class="fas fa-info-circle"></i>
-        Admin key is provided by the system administrator. Default: <code>ADMIN_SECRET_2024</code>
+        Contact your administrator for the secret key.
       </p>
     </div>
 

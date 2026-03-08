@@ -1,0 +1,198 @@
+<div class="dashboard-page">
+  <!-- Welcome Hero -->
+  <section class="dash-hero">
+    <div class="dash-hero-bg">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+    </div>
+    <div class="dash-hero-content">
+      <div class="welcome-badge">🎊 Customer Portal</div>
+      <h1>{{ greeting }}, <span class="name-gold">{{ username }}</span>!</h1>
+      <p>Find and book your perfect celebration venue</p>
+    </div>
+    <div class="dash-hero-actions">
+      <button class="btn-gold" (click)="navigate('/customer/halls')">
+        <i class="fas fa-search"></i> Explore Halls
+      </button>
+      <button class="btn-outline-gold" (click)="navigate('/customer/bookings')">
+        <i class="fas fa-calendar-check"></i> My Bookings
+      </button>
+    </div>
+  </section>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading your dashboard...</p>
+  </div>
+
+  <div class="container dash-content" *ngIf="!isLoading">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0s" (click)="navigate('/customer/halls')">
+        <div class="stat-icon-wrap">
+          <span class="stat-icon">🏛️</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.totalHalls }}</div>
+          <div class="stat-label">Available Halls</div>
+        </div>
+        <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.1s" (click)="navigate('/customer/bookings')">
+        <div class="stat-icon-wrap blue">
+          <span class="stat-icon">📅</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.myBookings }}</div>
+          <div class="stat-label">My Bookings</div>
+        </div>
+        <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.15s">
+        <div class="stat-icon-wrap orange">
+          <span class="stat-icon">⏳</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.pendingBookings }}</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.2s">
+        <div class="stat-icon-wrap green">
+          <span class="stat-icon">✅</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.confirmedBookings }}</div>
+          <div class="stat-label">Confirmed</div>
+        </div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp" style="animation-delay:0.25s" (click)="navigate('/customer/reviews')">
+        <div class="stat-icon-wrap">
+          <span class="stat-icon">⭐</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.myReviews }}</div>
+          <div class="stat-label">My Reviews</div>
+        </div>
+        <div class="stat-arrow"><i class="fas fa-arrow-right"></i></div>
+      </div>
+
+      <div class="stat-card animate-fadeInUp revenue-card" style="animation-delay:0.3s">
+        <div class="stat-icon-wrap gold">
+          <span class="stat-icon">💳</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">₹{{ stats.totalSpent | number }}</div>
+          <div class="stat-label">Total Spent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two column -->
+    <div class="dash-grid">
+      <!-- Quick Actions -->
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+        </div>
+        <div class="quick-actions">
+          <button class="qa-btn" (click)="navigate('/customer/halls')">
+            <span class="qa-icon">🔍</span>
+            <span>Browse Halls</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/customer/bookings')">
+            <span class="qa-icon">📋</span>
+            <span>My Bookings</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/customer/reviews')">
+            <span class="qa-icon">⭐</span>
+            <span>My Reviews</span>
+          </button>
+          <button class="qa-btn" (click)="navigate('/home')">
+            <span class="qa-icon">🏠</span>
+            <span>Home Page</span>
+          </button>
+        </div>
+
+        <!-- Tips -->
+        <div class="tips-box">
+          <div class="tips-header"><i class="fas fa-lightbulb"></i> Quick Tips</div>
+          <ul class="tips-list">
+            <li>Browse halls and click <strong>Book Now</strong> to make a reservation</li>
+            <li>Use filters to find the perfect venue matching your budget</li>
+            <li>Cancel pending bookings anytime from <strong>My Bookings</strong></li>
+            <li>Leave a review after your event to help others</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="dash-card">
+        <div class="card-header">
+          <h2><i class="fas fa-history"></i> Recent Bookings</h2>
+          <button class="btn-link" (click)="navigate('/customer/bookings')">View All →</button>
+        </div>
+
+        <div class="empty-state-sm" *ngIf="bookings.length === 0">
+          <div style="font-size:2.5rem; margin-bottom:0.5rem;">📋</div>
+          <p>No bookings yet</p>
+          <button class="btn-gold" style="margin-top:0.75rem; font-size:0.85rem; padding:0.5rem 1.25rem"
+                  (click)="navigate('/customer/halls')">
+            Book Your First Hall
+          </button>
+        </div>
+
+        <div class="recent-list" *ngIf="bookings.length > 0">
+          <div class="recent-item" *ngFor="let b of getRecentBookings()">
+            <div class="ri-icon">🏛️</div>
+            <div class="ri-info">
+              <div class="ri-name">{{ b.partyHall?.hallName || 'Party Hall' }}</div>
+              <div class="ri-hall">{{ b.partyHall?.hallLocation || '' }}</div>
+              <div class="ri-date">
+                <i class="fas fa-calendar"></i>
+                {{ b.fromDate | date:'dd MMM' }} → {{ b.toDate | date:'dd MMM yyyy' }}
+              </div>
+            </div>
+            <div class="ri-right">
+              <span class="badge" [class]="getStatusClass(b.status)">{{ b.status }}</span>
+              <div class="ri-price">₹{{ b.totalPrice | number }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured Halls -->
+    <div class="dash-card halls-overview" *ngIf="featuredHalls.length > 0">
+      <div class="card-header">
+        <h2><i class="fas fa-star"></i> Available Halls</h2>
+        <button class="btn-link" (click)="navigate('/customer/halls')">See All →</button>
+      </div>
+      <div class="halls-mini-grid">
+        <div class="hall-mini-card" *ngFor="let hall of featuredHalls" (click)="navigate('/customer/halls')">
+          <div class="hm-image">
+            <img [src]="hall.hallImageUrl || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=200'"
+                 [alt]="hall.hallName"
+                 onerror="this.src='https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=200'">
+            <div class="hm-status available">Available</div>
+          </div>
+          <div class="hm-info">
+            <div class="hm-name">{{ hall.hallName }}</div>
+            <div class="hm-loc"><i class="fas fa-map-marker-alt"></i> {{ hall.hallLocation }}</div>
+            <div class="hm-price">₹{{ hall.price | number }}/day · {{ hall.capacity }} guests</div>
+          </div>
+          <div class="hm-book-btn">
+            <button class="btn-gold" style="font-size:0.75rem; padding:0.4rem 0.875rem">
+              Book Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

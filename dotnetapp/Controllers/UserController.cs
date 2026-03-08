@@ -44,7 +44,8 @@ namespace dotnetapp.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                var detail = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = detail });
             }
         }
 

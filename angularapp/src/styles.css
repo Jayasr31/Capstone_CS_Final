@@ -26,6 +26,23 @@
   --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Light Mode overrides ────────────────────────────── */
+body.light-mode {
+  --deep-navy:  #F0F2F5;
+  --navy:       #E4E7EC;
+  --navy-card:  #FFFFFF;
+  --navy-light: #D8DCE5;
+  --text-primary:   #0F172A;
+  --text-secondary: #334155;
+  --text-muted:     #64748B;
+  --border: rgba(15, 23, 42, 0.12);
+  --shadow-gold: 0 0 30px rgba(180, 140, 10, 0.15);
+  background-color: var(--deep-navy) !important;
+  color: var(--text-primary) !important;
+}
+body.light-mode ::-webkit-scrollbar-track { background: #E4E7EC; }
+body.light-mode ::-webkit-scrollbar-thumb { background: #B8960C; }
+
 * {
   margin: 0;
   padding: 0;
@@ -357,8 +374,293 @@ tr:hover td { background: rgba(212, 175, 55, 0.03); }
   gap: 0.25rem;
 }
 
+/* Ripple on button click */
+.btn-gold, .btn-outline-gold, .btn-danger {
+  position: relative;
+  overflow: hidden;
+}
+.btn-gold:active::after, .btn-outline-gold:active::after, .btn-danger:active::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.18);
+  border-radius: inherit;
+  animation: ripple-fade 0.4s ease;
+}
+@keyframes ripple-fade {
+  from { opacity: 1; transform: scale(0.6); }
+  to   { opacity: 0; transform: scale(2); }
+}
+
+/* Interactive hover glow on cards */
+.card:hover {
+  box-shadow: 0 0 0 1px rgba(212,175,55,0.35), 0 12px 40px rgba(212,175,55,0.12);
+}
+
+/* Glow on nav links */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 50%;
+  width: 0; height: 2px;
+  background: linear-gradient(90deg, #D4AF37, #F5E8A0);
+  border-radius: 2px;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.nav-link:hover::after, .nav-link.active::after {
+  width: 100%; left: 0;
+}
+
+/* Hover shimmer on form controls */
+.form-control:hover {
+  border-color: rgba(212,175,55,0.4);
+}
+
+/* Hover lift on table rows */
+tr:hover td {
+  background: rgba(212,175,55,0.04);
+  transition: background 0.2s ease;
+}
+
+/* Tooltip pulse on icons with title attr */
+[title]:hover {
+  position: relative;
+}
+
+/* Badge bounce on hover */
+.badge {
+  transition: transform 0.2s ease;
+}
+.badge:hover {
+  transform: scale(1.08);
+}
+
+/* Input focus ring animation */
+.form-control:focus {
+  animation: focus-ring 0.3s ease;
+}
+@keyframes focus-ring {
+  from { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); }
+  to   { box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
+}
+
+/* Spinner pulse */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Floating label glow */
+.form-label {
+  transition: color 0.2s ease;
+}
+.form-group:focus-within .form-label {
+  color: #D4AF37;
+}
+
 /* Responsive grid */
 .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
 .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+
+/* ─────────────────────────────────────────────────────────
+   Light Mode — Component-level overrides
+   Palette: white cards · slate-900 text · gold accents
+   ───────────────────────────────────────────────────────── */
+
+/* Navbar */
+body.light-mode .navbar {
+  background: rgba(255,255,255,0.97) !important;
+  border-bottom: 1px solid rgba(15,23,42,0.1) !important;
+  box-shadow: 0 2px 16px rgba(15,23,42,0.08) !important;
+}
+body.light-mode .nav-link         { color: #1E293B !important; font-weight: 500; }
+body.light-mode .nav-link:hover   { color: #B8960C !important; }
+body.light-mode .nav-link.active  { color: #B8960C !important; }
+body.light-mode .brand-name       { color: #0F172A !important; }
+body.light-mode .brand-accent     { color: #B8960C !important; }
+body.light-mode .user-avatar      { background: #FEF3C7 !important; color: #92400E !important; border: 2px solid #D97706 !important; }
+body.light-mode .user-name        { color: #1E293B !important; }
+body.light-mode .mobile-toggle span { background: #0F172A !important; }
+
+/* Page hero */
+body.light-mode .page-hero { background: linear-gradient(135deg, #1E293B 0%, #334155 100%) !important; }
+body.light-mode .section-title   { color: #D4AF37 !important; -webkit-text-fill-color: unset !important; background: none !important; }
+body.light-mode .section-subtitle { color: #CBD5E1 !important; }
+
+/* Hall cards */
+body.light-mode .hall-card {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15,23,42,0.1) !important;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.07) !important;
+}
+body.light-mode .hall-card:hover {
+  box-shadow: 0 8px 30px rgba(15,23,42,0.12), 0 0 0 1px rgba(180,140,10,0.3) !important;
+}
+body.light-mode .hall-name        { color: #0F172A !important; }
+body.light-mode .hall-description { color: #475569 !important; }
+body.light-mode .hall-body        { background: #FFFFFF !important; }
+body.light-mode .detail-item      { color: #475569 !important; }
+body.light-mode .detail-item i    { color: #B8960C !important; }
+body.light-mode .hall-footer      { border-top: 1px solid rgba(15,23,42,0.1) !important; }
+body.light-mode .price-label      { color: #64748B !important; }
+body.light-mode .price-value      { color: #0F172A !important; }
+body.light-mode .price-period     { color: #64748B !important; }
+
+/* Filters bar */
+body.light-mode .filters-bar {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15,23,42,0.1) !important;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.06) !important;
+}
+body.light-mode .search-box      { background: #F1F5F9 !important; border: 1px solid rgba(15,23,42,0.12) !important; }
+body.light-mode .search-box i    { color: #94A3B8 !important; }
+body.light-mode .search-box input { color: #0F172A !important; background: transparent !important; }
+body.light-mode .search-box input::placeholder { color: #94A3B8 !important; }
+body.light-mode .filter-label, body.light-mode .filter-item label { color: #475569 !important; }
+body.light-mode .filter-item span { color: #1E293B !important; font-weight: 600; }
+body.light-mode .filter-select, body.light-mode .filter-input {
+  background: #F1F5F9 !important;
+  border: 1px solid rgba(15,23,42,0.12) !important;
+  color: #0F172A !important;
+}
+body.light-mode .results-count   { color: #475569 !important; }
+body.light-mode .results-count strong { color: #0F172A !important; }
+
+/* Modal */
+body.light-mode .modal-backdrop { background: rgba(15,23,42,0.55) !important; }
+body.light-mode .modal-box {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15,23,42,0.12) !important;
+  box-shadow: 0 24px 60px rgba(15,23,42,0.18) !important;
+}
+body.light-mode .modal-header {
+  background: linear-gradient(135deg, #1E293B, #334155) !important;
+  border-bottom: 1px solid rgba(15,23,42,0.15) !important;
+}
+body.light-mode .modal-header h3 { color: #F8FAFC !important; }
+body.light-mode .modal-header p  { color: #CBD5E1 !important; }
+body.light-mode .close-btn       { color: #94A3B8 !important; }
+body.light-mode .close-btn:hover { color: #F8FAFC !important; background: rgba(255,255,255,0.12) !important; }
+
+/* Modal dividers */
+body.light-mode .modal-divider::before,
+body.light-mode .modal-divider::after { background: rgba(15,23,42,0.12) !important; }
+body.light-mode .modal-divider span   { color: #B8960C !important; background: #FFFFFF !important; font-weight: 600; }
+
+/* Detail chips */
+body.light-mode .detail-chip {
+  background: #F1F5F9 !important;
+  border: 1px solid rgba(15,23,42,0.1) !important;
+  color: #334155 !important;
+}
+body.light-mode .detail-chip i      { color: #B8960C !important; }
+body.light-mode .hall-detail-desc   { color: #334155 !important; }
+body.light-mode .capacity-label     { color: #475569 !important; }
+
+/* Booking summary */
+body.light-mode .booking-summary {
+  background: #F8FAFC !important;
+  border: 1px solid rgba(15,23,42,0.1) !important;
+  border-radius: 12px;
+}
+body.light-mode .summary-row        { border-bottom: 1px solid rgba(15,23,42,0.07) !important; }
+body.light-mode .summary-row span   { color: #475569 !important; }
+body.light-mode .summary-row strong { color: #0F172A !important; }
+body.light-mode .gold-text          { color: #B8960C !important; }
+
+/* Form controls */
+body.light-mode .form-control {
+  background: #F8FAFC !important;
+  border: 1px solid rgba(15,23,42,0.15) !important;
+  color: #0F172A !important;
+}
+body.light-mode .form-control:focus {
+  border-color: #B8960C !important;
+  box-shadow: 0 0 0 3px rgba(184,150,12,0.15) !important;
+  background: #FFFFFF !important;
+}
+body.light-mode .form-control::placeholder { color: #94A3B8 !important; }
+body.light-mode .form-label  { color: #334155 !important; font-weight: 600; }
+body.light-mode select.form-control option { background: #FFFFFF !important; color: #0F172A !important; }
+
+/* Coupon section */
+body.light-mode .coupon-section {
+  background: #FFFBEB !important;
+  border: 1px dashed rgba(180,140,10,0.4) !important;
+}
+body.light-mode .coupon-header   { color: #92400E !important; }
+body.light-mode .coupon-hint     { color: #78716C !important; }
+body.light-mode .coupon-input    { background: #FFFFFF !important; border-color: rgba(180,140,10,0.3) !important; color: #0F172A !important; }
+body.light-mode .coupon-error    { color: #DC2626 !important; }
+
+/* Table */
+body.light-mode .table-wrapper   { border: 1px solid rgba(15,23,42,0.1) !important; background: #FFFFFF !important; }
+body.light-mode thead th  { background: #1E293B !important; color: #D4AF37 !important; }
+body.light-mode tbody td  { color: #1E293B !important; border-bottom-color: rgba(15,23,42,0.08) !important; }
+body.light-mode tbody tr:hover td { background: #F1F5F9 !important; }
+
+/* Cards (generic) */
+body.light-mode .card {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15,23,42,0.1) !important;
+}
+body.light-mode .card:hover { box-shadow: 0 8px 30px rgba(15,23,42,0.1) !important; }
+
+/* Badges */
+body.light-mode .badge-success { background: #DCFCE7 !important; color: #166534 !important; border-color: #86EFAC !important; }
+body.light-mode .badge-warning { background: #FEF9C3 !important; color: #854D0E !important; border-color: #FDE047 !important; }
+body.light-mode .badge-danger  { background: #FEE2E2 !important; color: #991B1B !important; border-color: #FCA5A5 !important; }
+body.light-mode .badge-info    { background: #DBEAFE !important; color: #1E40AF !important; border-color: #93C5FD !important; }
+
+/* Alerts */
+body.light-mode .alert-success { background: #DCFCE7 !important; color: #166534 !important; border-color: #86EFAC !important; }
+body.light-mode .alert-error   { background: #FEE2E2 !important; color: #991B1B !important; border-color: #FCA5A5 !important; }
+
+/* Dashboard stat cards */
+body.light-mode .stat-card       { background: #FFFFFF !important; border: 1px solid rgba(15,23,42,0.1) !important; }
+body.light-mode .stat-value      { color: #0F172A !important; }
+body.light-mode .stat-label      { color: #475569 !important; }
+body.light-mode .stat-icon       { background: #FEF3C7 !important; color: #92400E !important; }
+
+/* Chatbot */
+body.light-mode .chatbot-icon { box-shadow: 0 4px 20px rgba(15,23,42,0.18) !important; }
+body.light-mode .chatbot-window {
+  background: #FFFFFF !important;
+  border: 1px solid rgba(15,23,42,0.12) !important;
+  box-shadow: 0 20px 60px rgba(15,23,42,0.18) !important;
+}
+body.light-mode .chatbot-header { background: linear-gradient(135deg, #1E293B, #334155) !important; }
+body.light-mode .chatbot-messages { background: #F8FAFC !important; }
+body.light-mode .message.bot .message-bubble { background: #E2E8F0 !important; color: #0F172A !important; }
+body.light-mode .chatbot-input input { background: #F1F5F9 !important; color: #0F172A !important; border-color: rgba(15,23,42,0.15) !important; }
+
+/* Empty & loading states */
+body.light-mode .empty-state     { color: #475569 !important; }
+body.light-mode .empty-icon      { filter: grayscale(0.3); }
+body.light-mode .loading-state p { color: #475569 !important; }
+
+/* Price display in modal */
+body.light-mode .price-display   { color: #B8960C !important; background: #FFFBEB !important; border-color: rgba(180,140,10,0.25) !important; }
+
+/* Theme toggle in light mode */
+body.light-mode .theme-toggle-btn {
+  background: #F1F5F9 !important;
+  border-color: rgba(15,23,42,0.15) !important;
+  color: #0F172A !important;
+}
+body.light-mode .theme-toggle-btn:hover { background: #E2E8F0 !important; }
+
+/* Reviews section */
+body.light-mode .reviews-heading    { color: #0F172A !important; }
+body.light-mode .review-card        { background: #F8FAFC !important; border-color: rgba(15,23,42,0.08) !important; }
+body.light-mode .reviewer-name      { color: #0F172A !important; }
+body.light-mode .review-text        { color: #334155 !important; }
+body.light-mode .review-date        { color: #94A3B8 !important; }
+body.light-mode .no-reviews         { color: #64748B !important; }
+body.light-mode .avg-rating-value   { color: #0F172A !important; }
+body.light-mode .avg-rating-label   { color: #64748B !important; }
+
+/* Page hero section text in light mode is already dark (navy bg), keep stars/gold */
+body.light-mode .gold-divider { background: linear-gradient(90deg, #B8960C, #D4AF37) !important; }

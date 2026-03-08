@@ -9,4 +9,5 @@ export interface PartyHall {
   description: string;
   theme?: string;
   additionalImages?: string; // JSON string of image URL array
+  fullAddress?: string;   // Full street address for Google Maps pin
 }

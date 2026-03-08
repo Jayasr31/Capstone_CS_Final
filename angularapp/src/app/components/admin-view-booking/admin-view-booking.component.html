@@ -2,7 +2,7 @@
   <div class="page-hero">
     <h1 class="section-title">Manage Bookings</h1>
     <div class="gold-divider" style="margin: 0.75rem auto 0;"></div>
-    <p class="section-subtitle" style="margin-top:0.5rem">View and update all customer bookings</p>
+    <p class="section-subtitle" style="margin-top:0.5rem">View, filter and update all customer bookings</p>
   </div>
 
   <div class="container" style="padding-bottom: 4rem;">
@@ -14,61 +14,171 @@
       <p>Loading bookings...</p>
     </div>
 
-    <div class="stats-row" *ngIf="!isLoading">
-      <div class="stat-pill">Total: <strong>{{ bookings.length }}</strong></div>
-      <div class="stat-pill confirmed">Confirmed: <strong>{{ bookings | statusCount:'Confirmed' }}</strong></div>
-      <div class="stat-pill pending">Pending: <strong>{{ bookings | statusCount:'Pending' }}</strong></div>
-      <div class="stat-pill cancelled">Cancelled: <strong>{{ bookings | statusCount:'Cancelled' }}</strong></div>
-    </div>
+    <ng-container *ngIf="!isLoading">
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-pill">Total: <strong>{{ bookings.length }}</strong></div>
+        <div class="stat-pill confirmed">Confirmed: <strong>{{ bookings | statusCount:'Confirmed' }}</strong></div>
+        <div class="stat-pill pending">Pending: <strong>{{ bookings | statusCount:'Pending' }}</strong></div>
+        <div class="stat-pill cancelled">Cancelled: <strong>{{ bookings | statusCount:'Cancelled' }}</strong></div>
+        <div class="stat-pill revenue">Revenue: <strong>₹{{ getTotalRevenue() | number }}</strong></div>
+      </div>
 
-    <div class="table-wrapper" *ngIf="!isLoading">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Customer</th>
-            <th>Hall</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Persons</th>
-            <th>Total Price</th>
-            <th>Status</th>
-            <th>Update Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let booking of bookings; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>
-              <div class="customer-cell">
-                <div class="c-avatar">{{ (booking.user?.username || 'U').charAt(0) }}</div>
-                <div>
-                  <div class="c-name">{{ booking.user?.username || 'N/A' }}</div>
-                  <div class="c-email">{{ booking.user?.email || '' }}</div>
+      <!-- Filters Bar -->
+      <div class="filters-bar">
+        <div class="filter-row">
+          <div class="search-box-admin">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search by customer name, email or hall..."
+                   [(ngModel)]="searchQuery" (input)="applyFilters()">
+          </div>
+          <div class="filter-controls">
+            <select class="filter-select" [(ngModel)]="filterStatus" (change)="applyFilters()">
+              <option value="">All Status</option>
+              <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+            </select>
+            <input type="text" class="filter-input-sm" placeholder="Hall name..."
+                   [(ngModel)]="filterHall" (input)="applyFilters()">
+            <div class="date-filter">
+              <label>From:</label>
+              <input type="date" class="filter-input-date" [(ngModel)]="filterFromDate" (change)="applyFilters()">
+            </div>
+            <div class="date-filter">
+              <label>To:</label>
+              <input type="date" class="filter-input-date" [(ngModel)]="filterToDate" (change)="applyFilters()">
+            </div>
+            <select class="filter-select" [(ngModel)]="sortBy" (change)="applyFilters()">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="price-high">Price ↓</option>
+              <option value="price-low">Price ↑</option>
+            </select>
+            <button class="btn-clear" (click)="clearFilters()">
+              <i class="fas fa-times"></i> Clear
+            </button>
+          </div>
+        </div>
+        <div class="results-count-bar">
+          Showing <strong>{{ filteredBookings.length }}</strong> of {{ bookings.length }} bookings
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Customer</th>
+              <th>Hall</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Persons</th>
+              <th>Total Price</th>
+              <th>Status</th>
+              <th>Update Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let booking of filteredBookings; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <div class="customer-cell">
+                  <div class="c-avatar">{{ (booking.user?.username || 'U').charAt(0) }}</div>
+                  <div>
+                    <div class="c-name">{{ booking.user?.username || 'N/A' }}</div>
+                    <div class="c-email">{{ booking.user?.email || '' }}</div>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td>{{ booking.partyHall?.hallName || 'N/A' }}</td>
-            <td>{{ booking.fromDate | date:'dd MMM yyyy' }}</td>
-            <td>{{ booking.toDate | date:'dd MMM yyyy' }}</td>
-            <td>{{ booking.noOfPersons }}</td>
-            <td class="price-cell">₹{{ booking.totalPrice | number }}</td>
-            <td>
-              <span class="badge" [class]="getStatusClass(booking.status)">{{ booking.status }}</span>
-            </td>
-            <td>
-              <select class="status-select" [value]="booking.status" (change)="updateStatus(booking, $any($event.target).value)">
-                <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
-              </select>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td>
+                <div class="hall-cell-info">
+                  <div class="hall-name-txt">{{ booking.partyHall?.hallName || 'N/A' }}</div>
+                  <div class="hall-loc-txt">{{ booking.partyHall?.hallLocation || '' }}</div>
+                </div>
+              </td>
+              <td>{{ booking.fromDate | date:'dd MMM yyyy' }}</td>
+              <td>{{ booking.toDate | date:'dd MMM yyyy' }}</td>
+              <td>{{ booking.noOfPersons }}</td>
+              <td class="price-cell">₹{{ booking.totalPrice | number }}</td>
+              <td>
+                <span class="badge" [class]="getStatusClass(booking.status)">{{ booking.status }}</span>
+              </td>
+              <td>
+                <select class="status-select" [value]="booking.status"
+                        (change)="updateStatus(booking, $any($event.target).value)">
+                  <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+                </select>
+              </td>
+              <td>
+                <button class="btn-icon detail-btn" (click)="openDetail(booking)" title="View Details">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-      <div class="empty-state" *ngIf="bookings.length === 0">
-        <div class="empty-icon">📋</div>
-        <h3>No bookings yet</h3>
-        <p>Customer bookings will appear here</p>
+        <div class="empty-state" *ngIf="filteredBookings.length === 0">
+          <div class="empty-icon">📋</div>
+          <h3>No bookings found</h3>
+          <p>{{ bookings.length === 0 ? 'Customer bookings will appear here' : 'Try adjusting your filters' }}</p>
+          <button class="btn-outline-gold" *ngIf="bookings.length > 0" (click)="clearFilters()" style="margin-top:1rem">Clear Filters</button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Booking Detail Modal -->
+  <div class="modal-backdrop" *ngIf="showDetailModal" (click)="closeDetail()">
+    <div class="modal-box detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3><i class="fas fa-calendar-check"></i> Booking Details</h3>
+          <p>Booking #{{ selectedBooking?.bookingId }}</p>
+        </div>
+        <button class="close-btn" (click)="closeDetail()"><i class="fas fa-times"></i></button>
+      </div>
+      <div *ngIf="selectedBooking" class="detail-grid">
+        <div class="detail-section-box">
+          <div class="detail-section-title"><i class="fas fa-user"></i> Customer</div>
+          <div class="detail-item-row"><span>Name</span><strong>{{ selectedBooking.user?.username || 'N/A' }}</strong></div>
+          <div class="detail-item-row"><span>Email</span><strong>{{ selectedBooking.user?.email || 'N/A' }}</strong></div>
+          <div class="detail-item-row"><span>Mobile</span><strong>{{ selectedBooking.user?.mobileNumber || 'N/A' }}</strong></div>
+        </div>
+        <div class="detail-section-box">
+          <div class="detail-section-title"><i class="fas fa-building"></i> Party Hall</div>
+          <div class="detail-item-row"><span>Name</span><strong>{{ selectedBooking.partyHall?.hallName || 'N/A' }}</strong></div>
+          <div class="detail-item-row"><span>Location</span><strong>{{ selectedBooking.partyHall?.hallLocation || 'N/A' }}</strong></div>
+          <div class="detail-item-row"><span>Capacity</span><strong>{{ selectedBooking.partyHall?.capacity || 'N/A' }}</strong></div>
+        </div>
+        <div class="detail-section-box">
+          <div class="detail-section-title"><i class="fas fa-calendar"></i> Booking Period</div>
+          <div class="detail-item-row"><span>From</span><strong>{{ selectedBooking.fromDate | date:'dd MMM yyyy' }}</strong></div>
+          <div class="detail-item-row"><span>To</span><strong>{{ selectedBooking.toDate | date:'dd MMM yyyy' }}</strong></div>
+          <div class="detail-item-row"><span>Guests</span><strong>{{ selectedBooking.noOfPersons }}</strong></div>
+          <div class="detail-item-row"><span>Address</span><strong>{{ selectedBooking.address }}</strong></div>
+        </div>
+        <div class="detail-section-box">
+          <div class="detail-section-title"><i class="fas fa-receipt"></i> Payment</div>
+          <div class="detail-item-row"><span>Total</span><strong class="gold-txt">₹{{ selectedBooking.totalPrice | number }}</strong></div>
+          <div class="detail-item-row">
+            <span>Status</span>
+            <span class="badge" [class]="getStatusClass(selectedBooking.status)">{{ selectedBooking.status }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-update-section" *ngIf="selectedBooking">
+        <label class="form-label">Update Status</label>
+        <div class="update-row">
+          <select class="status-select" [(ngModel)]="selectedBooking.status">
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+          </select>
+          <button class="btn-gold" (click)="updateStatus(selectedBooking, selectedBooking.status); closeDetail()">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
       </div>
     </div>
   </div>

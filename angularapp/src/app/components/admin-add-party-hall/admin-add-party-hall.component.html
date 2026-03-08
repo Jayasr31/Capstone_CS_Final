@@ -22,6 +22,11 @@
         </div>
 
         <div class="form-group">
+          <label class="form-label"><i class="fas fa-map-marker-alt" style="color:#D4AF37"></i> Full Address <span style="font-size:0.78rem; color:var(--text-muted)">(used for Google Maps pin)</span></label>
+          <input type="text" class="form-control" [(ngModel)]="hall.fullAddress" placeholder="e.g., 12 Linking Road, Bandra West, Mumbai 400050">
+        </div>
+
+        <div class="form-group">
           <label class="form-label">Price per Day (₹) *</label>
           <input type="number" class="form-control" [(ngModel)]="hall.price" placeholder="50000" min="0">
         </div>
@@ -48,16 +53,35 @@
         </div>
 
         <div class="form-group full-width">
-          <label class="form-label">Main Image URL</label>
-          <input type="url" class="form-control" [(ngModel)]="hall.hallImageUrl" placeholder="https://example.com/image.jpg">
-          <div class="image-preview" *ngIf="hall.hallImageUrl">
-            <img [src]="hall.hallImageUrl" alt="Preview" onerror="this.style.display='none'">
+          <label class="form-label">Main Image *</label>
+          <div class="file-upload-area" (click)="mainImageInput.click()" *ngIf="!imagePreview">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <p class="upload-text">Click to upload main image</p>
+            <p class="upload-hint">PNG, JPG, WEBP — Max 5MB</p>
+          </div>
+          <input #mainImageInput type="file" accept="image/*" style="display:none" (change)="onMainImageSelected($event)">
+          <div class="image-preview-box" *ngIf="imagePreview">
+            <img [src]="imagePreview" alt="Main Image Preview" class="preview-img">
+            <button type="button" class="btn-remove-img" (click)="removeMainImage()">
+              <i class="fas fa-times"></i> Remove
+            </button>
           </div>
         </div>
 
         <div class="form-group full-width">
-          <label class="form-label">Additional Image URLs (one per line)</label>
-          <textarea class="form-control" [(ngModel)]="additionalImagesInput" placeholder="https://example.com/img2.jpg&#10;https://example.com/img3.jpg" rows="3"></textarea>
+          <label class="form-label">Additional Images (up to 5)</label>
+          <div class="file-upload-area secondary-upload" (click)="additionalImagesInput.click()">
+            <i class="fas fa-images upload-icon-sm"></i>
+            <p class="upload-text">Click to upload additional images</p>
+            <p class="upload-hint">Up to 5 images — PNG, JPG, WEBP</p>
+          </div>
+          <input #additionalImagesInput type="file" accept="image/*" multiple style="display:none" (change)="onAdditionalImagesSelected($event)">
+          <div class="additional-previews" *ngIf="additionalImagePreviews.length > 0">
+            <div class="additional-preview-item" *ngFor="let src of additionalImagePreviews; let i = index">
+              <img [src]="src" alt="Additional Image {{i+1}}">
+              <button type="button" class="btn-remove-small" (click)="removeAdditionalImage(i)"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
         </div>
 
         <div class="form-group full-width">

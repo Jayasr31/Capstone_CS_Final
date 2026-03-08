@@ -67,4 +67,10 @@ export class PartyhallService {
       headers: this.getHeaders()
     });
   }
+
+  getReviewsByHallId(hallId: number): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.apiUrl}/api/Review/hall/${hallId}`, {
+      headers: this.getHeaders()
+    });
+  }
 }

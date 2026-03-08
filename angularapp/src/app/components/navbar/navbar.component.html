@@ -1,7 +1,7 @@
 <nav class="navbar" [class.scrolled]="isScrolled">
   <div class="nav-container">
-    <!-- Logo -->
-    <a class="nav-brand" [routerLink]="authService.isLoggedIn() ? (authService.getUserRole() === 'Admin' ? '/admin-dashboard' : '/customer-dashboard') : '/login'">
+    <!-- Logo → always goes to home page -->
+    <a class="nav-brand" [routerLink]="authService.isLoggedIn() ? '/home' : '/login'">
       <div class="brand-icon">🎉</div>
       <div class="brand-text">
         <span class="brand-name">Celebrate</span><span class="brand-accent">Spot</span>
@@ -10,7 +10,10 @@
 
     <!-- Desktop Menu -->
     <div class="nav-links" [class.mobile-open]="showMobileMenu">
-      <a class="nav-link" routerLink="/home" routerLinkActive="active" *ngIf="authService.isLoggedIn()">Home</a>
+      <!-- Home → role-based dashboard -->
+      <a class="nav-link" routerLinkActive="active"
+         [routerLink]="authService.getUserRole() === 'Admin' ? '/admin-dashboard' : '/customer-dashboard'"
+         *ngIf="authService.isLoggedIn()">Home</a>
 
       <!-- Admin Links -->
       <ng-container *ngIf="authService.isLoggedIn() && authService.getUserRole() === 'Admin'">
@@ -40,11 +43,20 @@
         <a class="nav-link" routerLink="/customer/reviews" routerLinkActive="active">
           <i class="fas fa-star"></i> Reviews
         </a>
+        <a class="nav-link fav-nav-link" routerLink="/customer/halls" [queryParams]="{showFav: '1'}" routerLinkActive="active">
+          <i class="fas fa-heart"></i> Favourites
+          <span class="fav-count-badge" *ngIf="favouritesService.getAll().length > 0">{{ favouritesService.getAll().length }}</span>
+        </a>
       </ng-container>
 
       <a class="nav-link" routerLink="/developer" routerLinkActive="active">
         <i class="fas fa-code"></i> Developers
       </a>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle-btn" (click)="themeService.toggle()" [title]="themeService.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <i [class]="themeService.isDark ? 'fas fa-sun' : 'fas fa-moon'"></i>
+      </button>
 
       <!-- Auth buttons -->
       <ng-container *ngIf="!authService.isLoggedIn()">
@@ -71,3 +83,18 @@
     </button>
   </div>
 </nav>
+
+<!-- Logout Confirmation Modal -->
+<div class="logout-overlay" *ngIf="showLogoutModal" (click)="cancelLogout()">
+  <div class="logout-modal" (click)="$event.stopPropagation()">
+    <div class="logout-icon">👋</div>
+    <h3 class="logout-title">Leaving so soon?</h3>
+    <p class="logout-subtitle">Are you sure you want to logout?</p>
+    <div class="logout-actions">
+      <button class="btn-logout-cancel" (click)="cancelLogout()">Stay</button>
+      <button class="btn-logout-confirm" (click)="confirmLogout()">
+        <i class="fas fa-sign-out-alt"></i> Yes, Logout
+      </button>
+    </div>
+  </div>
+</div>

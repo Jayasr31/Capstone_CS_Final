@@ -1,2 +1,18 @@
 <app-navbar *ngIf="showNavbar"></app-navbar>
 <router-outlet></router-outlet>
+<app-chatbot></app-chatbot>
+
+<!-- Custom cursor glow -->
+<div class="cursor-glow" [style.left.px]="cursorX" [style.top.px]="cursorY"></div>
+<div class="cursor-dot" [style.left.px]="cursorX" [style.top.px]="cursorY"></div>
+
+<!-- Click sparkles -->
+<div class="sparkle-wrap" *ngFor="let s of sparkles"
+     [style.left.px]="s.x" [style.top.px]="s.y">
+  <div class="sp sp1"></div>
+  <div class="sp sp2"></div>
+  <div class="sp sp3"></div>
+  <div class="sp sp4"></div>
+  <div class="sp sp5"></div>
+  <div class="sp sp6"></div>
+</div>

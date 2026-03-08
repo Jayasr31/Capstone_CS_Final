@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PartyhallService } from '../../services/partyhall.service';
 import { AuthService } from '../../services/auth.service';
 import { Review } from '../../models/review.model';
+import { PartyHall } from '../../models/partyhall.model';
 
 @Component({
   selector: 'app-add-review',
@@ -11,12 +12,14 @@ import { Review } from '../../models/review.model';
 export class AddReviewComponent implements OnInit {
   review: Review = {
     userId: 0,
+    partyHallId: undefined,
     subject: '',
     body: '',
     rating: 5,
     dateCreated: new Date().toISOString()
   };
 
+  halls: PartyHall[] = [];
   myReviews: Review[] = [];
   hoverRating = 0;
   successMsg = '';
@@ -33,6 +36,10 @@ export class AddReviewComponent implements OnInit {
     if (this.isAdmin) {
       this.loadAllReviews();
     } else {
+      this.hallService.getAllPartyHalls().subscribe({
+        next: (halls) => { this.halls = halls; },
+        error: () => {}
+      });
       this.loadMyReviews();
     }
   }
@@ -54,6 +61,10 @@ export class AddReviewComponent implements OnInit {
   setRating(r: number): void { this.review.rating = r; }
 
   submitReview(): void {
+    if (!this.review.partyHallId) {
+      this.errorMsg = 'Please select a party hall.';
+      return;
+    }
     if (!this.review.subject || !this.review.body) {
       this.errorMsg = 'Subject and review body are required.';
       return;
@@ -66,7 +77,7 @@ export class AddReviewComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.successMsg = 'Review submitted successfully! Thank you for your feedback.';
-        this.review = { userId: this.authService.getUserId(), subject: '', body: '', rating: 5, dateCreated: new Date().toISOString() };
+        this.review = { userId: this.authService.getUserId(), partyHallId: undefined, subject: '', body: '', rating: 5, dateCreated: new Date().toISOString() };
         this.loadMyReviews();
         setTimeout(() => this.successMsg = '', 4000);
       },
